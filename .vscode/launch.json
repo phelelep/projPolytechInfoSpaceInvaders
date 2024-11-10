@@ -1,0 +1,26 @@
+{
+    "version": "1.0.0",
+    "configurations": [
+      {
+        "name": "Debug C Program",
+        "type": "cppdbg",
+        "request": "launch",
+        "program": "${workspaceFolder}/Compiled/output_file", // Path to the compiled executable
+        "args": [],
+        "stopAtEntry": false,
+        "cwd": "${workspaceFolder}",
+        "environment": [],
+        "externalConsole": true, // Use an external console for debugging
+        "MIMode": "gdb", // Specify the debugger (e.g., gdb for GCC)
+        "miDebuggerPath": "/usr/bin/gdb", // Path to the gdb debugger
+        "setupCommands": [
+          {
+            "description": "Enable pretty-printing for gdb",
+            "text": "-enable-pretty-printing",
+            "ignoreFailures": true
+          }
+        ]
+      }
+    ]
+  }
+  
