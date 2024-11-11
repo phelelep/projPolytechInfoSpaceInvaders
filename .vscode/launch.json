@@ -5,7 +5,7 @@
           "name": "Debug C Program",
           "type": "cppdbg",
           "request": "launch",
-          "program": "${workspaceFolder}/main",  // Corrected path to the compiled program
+          "program": "${workspaceFolder}/bin/main",  // Corrected path to the compiled program
           "args": [],
           "stopAtEntry": false,
           "cwd": "${workspaceFolder}",

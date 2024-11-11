@@ -2,30 +2,6 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "type": "shell",
-            "label": "Build C Program with GCC",
-            "command": "C:\\TDM-GCC-64\\bin\\gcc.exe",
-            "args": [
-                "-fdiagnostics-color=always",
-                "-Wall",
-                "-g",
-                "main.c",
-                "-o",
-                "main",
-                "-I${workspaceFolder}/lib/include",
-                "-L${workspaceFolder}/lib/lib",
-                "-lSDL2"
-            ],
-            "options": {
-                "cwd": "${fileDirname}"
-            },
-            "problemMatcher": [
-                "$gcc"
-            ],
-            "group": "build",
-            "detail": "Build C program task using GCC"
-        },
-        {
             "type": "cppbuild",
             "label": "C/C++: gcc.exe build active file",
             "command": "C:/TDM-GCC-64/bin/gcc.exe",
@@ -35,12 +11,14 @@
                 "-g",
                 "${workspaceFolder}/src/main.c",
                 "-o",
-                "${workspaceFolder}/main",
+                "${workspaceFolder}/bin/main",
                 "-I${workspaceFolder}/lib/include",
                 "-L${workspaceFolder}/lib/lib",
+                "-I${workspaceFolder}/bin",
                 "-lmingw32",
                 "-lSDL2main",
-                "-lSDL2"
+                "-lSDL2",
+                "-lSDL2_ttf"
             ],
             "options": {
                  "cwd": "${workspaceFolder}"
