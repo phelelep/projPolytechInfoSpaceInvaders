@@ -2,6 +2,29 @@
 #include <stdlib.h>  // for exit failure
 #include <SDL2/SDL.h>   
 #include <SDL2/SDL_ttf.h> // for text 
+#include "tools.h"
+#include "tools.c"
+
+#define FONT_PATH_TITLE  "C:\\Users\\PHELELEP\\Documents\\GitHub\\projPolytechInfoSpaceInvaders\\fonts\\Electron.ttf"
+#define FONT_PATH_DESIGN "C:\\Users\\PHELELEP\\Documents\\GitHub\\projPolytechInfoSpaceInvaders\\fonts\\Invaders.ttf"
+#define FONT_PATH_PLAY   "C:\\Users\\PHELELEP\\Documents\\GitHub\\projPolytechInfoSpaceInvaders\\fonts\\Electron.ttf"
+
+#define COLOR_WHITE {255, 255, 255, 255}  // Bright White (Stars)
+#define COLOR_STAR_YELLOW {255, 223, 0, 255}  // Star Yellow
+#define COLOR_SUPERNOVA {255, 87, 51, 255}  // Supernova Orange-Red
+#define COLOR_NEBULA_PURPLE {138, 43, 226, 255}  // Nebula Purple
+#define COLOR_DEEP_SPACE {25, 25, 112, 255}  // Deep Space Blue
+#define COLOR_GALACTIC_GREEN {60, 179, 113, 255}  // Galactic Green
+#define COLOR_PLANETARY_BLUE {70, 130, 180, 255}  // Planetary Blue
+#define COLOR_METEORITE_GRAY {112, 128, 144, 255}  // Meteorite Gray
+#define COLOR_MOONLIGHT {192, 192, 192, 255}  // Moonlight Silver
+#define COLOR_COSMIC_PINK {255, 105, 180, 255}  // Cosmic Pink
+#define COLOR_BLACK_HOLE {0, 0, 0, 255}  // Absolute Black
+#define COLOR_AURORA_TEAL {64, 224, 208, 255}  // Aurora Teal
+#define COLOR_SOLAR_FLARE {255, 140, 0, 255}  // Solar Flare Orange
+#define COLOR_STARDUST {218, 165, 32, 255}  // Stardust Gold
+#define COLOR_ECLIPSE {72, 61, 139, 255}  // Eclipse Dark Blue
+
 
 
 const int WIDTH = 960, HEIGHT = 720;
@@ -9,12 +32,21 @@ const int WIDTH = 960, HEIGHT = 720;
 
 void cleanup(SDL_Window *window, SDL_Renderer *renderer) 
 {
-    printf("Ferme la game");
-    SDL_DestroyWindow(window);
-    SDL_DestroyRenderer(renderer);
+    printf("Cleaning up resources...\n");
+    
+    // Destroy window and renderer
+    if (window) SDL_DestroyWindow(window);
+    if (renderer) SDL_DestroyRenderer(renderer);
+    // Quit SDL_ttf and SDL
     TTF_Quit(); 
     SDL_Quit();
 }
+
+void cleanupAll(SDL_Window *window, SDL_Renderer *renderer)
+{
+
+}
+
 
 
 
@@ -47,25 +79,45 @@ int main(int argc, char *argv[])
         SDL_Quit();
         return EXIT_FAILURE;
     }
-    // font & textSurface & textTexture
-    TTF_Font *font = TTF_OpenFont("C:\\Users\\PHELELEP\\Documents\\GitHub\\projPolytechInfoSpaceInvaders\\fonts\\Halo_Dek.ttf", 140);
-    SDL_Color textColor = { 255, 255, 255,255};
-    SDL_Surface *textSurface = TTF_RenderText_Solid(font,"Play", textColor);
-    SDL_Texture *textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
-    SDL_FreeSurface (textSurface);
 
-    if (!font || !textSurface || !textTexture)
-    {
-        printf("Failed in creating text (font, texture or surface ... ): %s\n", TTF_GetError());
+    // text for the title
+    SDL_Color color = COLOR_WHITE;
+    SDL_Texture * textTexture4Title =createTextTexture (renderer, FONT_PATH_TITLE,540, "Space Invaders", color);
+    if (!textTexture4Title) {
+        printf("Failed to create title texture.\n");
+        cleanup(window, renderer);
+        return EXIT_FAILURE;
+    }
+
+    // text for design
+    SDL_Color color2 = COLOR_STAR_YELLOW;
+    SDL_Texture * textTexture4Design =createTextTexture (renderer, FONT_PATH_DESIGN ,240, "Space Invaders", color2);
+    if (!textTexture4Design) {
+        printf("Failed to create design texture.\n");
         cleanup(window, renderer);
         return EXIT_FAILURE;
     }
 
 
-    // buton
-    SDL_Rect startButton = {WIDTH/2 -75, HEIGHT/2 - 25, 150, 50};
-    SDL_Rect textRect = {WIDTH/2 -70, HEIGHT/2 - 20, 140, 45};    // x posiiton départ ,y ,width,hight  
-    
+    // text for the PLAY button 
+    SDL_Color color3 = COLOR_SUPERNOVA;
+    SDL_Texture * textTexture4Play =createTextTexture (renderer, FONT_PATH_PLAY,120, "Play", color3);
+    if (!textTexture4Play) {
+        printf("Failed to create play texture.\n");
+        cleanup(window, renderer);
+        return EXIT_FAILURE;
+    }
+
+    int titleWidth = 400;
+    int titleHeight = 200;
+    int designWidth = 300;
+    int designHeight = 100;
+
+    /// Rects ---  is used to define the position and size of a rectangular area on the screen
+    SDL_Rect startButton = {WIDTH/2 -75, HEIGHT/2 - 25, 150, 50}; // x posiiton départ ,y ,width,hight  
+    SDL_Rect textRectTitle = {WIDTH / 2 - titleWidth / 2, HEIGHT / 2 - 200, titleWidth, titleHeight};
+    SDL_Rect textRectDesign = {WIDTH / 2 - designWidth / 2, HEIGHT / 2 + 100, designWidth, designHeight}; 
+    SDL_Rect textRectPlay = {WIDTH/2 -70, HEIGHT/2 - 20, 140, 45};  
 
     // init screen
     SDL_SetRenderDrawColor (renderer, 18,15,109,255); // fill screen with black color
@@ -76,7 +128,13 @@ int main(int argc, char *argv[])
     SDL_RenderFillRect(renderer, &startButton); // asign the button to the var startButton
     
 
-    SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
+    /*
+    This function renders the SDL_Texture (created from text surface) onto the screen at the position and size specified by the SDL_Rect
+    */
+    SDL_RenderCopy(renderer, textTexture4Title, NULL, &textRectTitle);
+    SDL_RenderCopy(renderer, textTexture4Design, NULL, &textRectDesign);
+    SDL_RenderCopy(renderer, textTexture4Play, NULL, &textRectPlay);
+
 
 
     SDL_RenderPresent(renderer); // to update the screen
@@ -110,6 +168,9 @@ int main(int argc, char *argv[])
                     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // to change color game is started
                     SDL_RenderClear(renderer);
                     SDL_RenderPresent(renderer); // updates the screen
+                    SDL_DestroyTexture(textTexture4Title);
+                    SDL_DestroyTexture(textTexture4Design);
+                    SDL_DestroyTexture(textTexture4Play);
                 }
 
         }
