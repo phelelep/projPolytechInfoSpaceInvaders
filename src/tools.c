@@ -3,7 +3,10 @@
 #include <stdlib.h> 
 
 
-SDL_Texture* createTextTexture(SDL_Renderer *renderer, const char *fontPath, int fontSize, const char *text, SDL_Color color) {
+
+
+SDL_Texture* createTextTexture(SDL_Renderer *renderer, const char *fontPath, int fontSize, const char *text, SDL_Color color) 
+{
     TTF_Font *font = TTF_OpenFont(fontPath, fontSize);
     if (!font) {
         printf("Failed to open font: %s\n", TTF_GetError());
@@ -25,3 +28,4 @@ SDL_Texture* createTextTexture(SDL_Renderer *renderer, const char *fontPath, int
     }
     return texture; 
 }
+
