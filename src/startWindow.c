@@ -1,14 +1,13 @@
 #include "startWindow.h"
-//#include "tools.h"
-#include "tools.c"
+#include "tools.h"
 
 
-int createLoadPage(
+void createLoadPage(
     SDL_Window *window, 
     SDL_Renderer *renderer, 
     SDL_Texture *textTexture4Title,
-     SDL_Texture *textTexture4Design,
-      SDL_Texture *textTexture4Play)
+    SDL_Texture *textTexture4Design,
+    SDL_Texture *textTexture4Play)
 {
     TTF_Init(); // for text
 
@@ -43,16 +42,16 @@ int createLoadPage(
         return EXIT_FAILURE;
     }
 
-    int titleWidth = 480;
+    int titleWidth = 500;
     int titleHeight = 150;
-    int designWidth = 700;
+    int designWidth = 750;
     int designHeight = 70;
 
     /// Rects ---  is used to define the position and size of a rectangular area on the screen
-    SDL_Rect startButton = {WIDTH/2 -75, HEIGHT/2 - 25, 150, 50}; // x posiiton départ ,y ,width,hight  
-    SDL_Rect textRectTitle = {WIDTH / 2 - titleWidth / 2, HEIGHT / 2 - 290, titleWidth, titleHeight};
-    SDL_Rect textRectDesign = {WIDTH / 2 - designWidth / 2, HEIGHT / 2 + 200, designWidth, designHeight}; 
-    SDL_Rect textRectPlay = {WIDTH/2 -70, HEIGHT/2 - 20, 140, 45};  
+    SDL_Rect startButton = {WIDTH/2 -75, HEIGHT/2 + 140 , 150, 50}; // x posiiton départ ,y ,width,hight  
+    SDL_Rect textRectTitle = {WIDTH / 2 - titleWidth / 2, HEIGHT / 2 - 330, titleWidth, titleHeight};
+    SDL_Rect textRectDesign = {WIDTH / 2 - designWidth / 2, HEIGHT / 2 + 260, designWidth, designHeight}; 
+    SDL_Rect textRectPlay = {WIDTH/2 -70, HEIGHT/2 + 140, 140, 45};  
 
     // init screen
     SDL_SetRenderDrawColor (renderer, 18,15,109,255); // fill screen with black color
@@ -73,5 +72,50 @@ int createLoadPage(
 
 
     SDL_RenderPresent(renderer); // to update the screen
+
+}
+
+void createScoreBoard(
+    SDL_Window *window,
+    SDL_Renderer *renderer, 
+    SDL_Texture *scoreboard, 
+    SDL_Texture *score1, 
+    SDL_Texture *score2, 
+    SDL_Texture *score3
+    )
+{
+    // text for the Scoreboard
+    SDL_Color color = COLOR_PLANETARY_BLUE;
+    scoreboard =createTextTexture (renderer, PATH_PREMIER ,340, "Scoreboard", color);
+    if (!scoreboard) 
+    {
+        printf("Failed to create scoreboard texture.\n");
+        cleanup(window, renderer);
+        return EXIT_FAILURE;
+    }
+    SDL_Color color = COLOR_COSMIC_PINK;
+    score1 =createTextTexture (renderer, PATH_PREMIER ,140, "First player", color);
+    if (!score1) 
+    {
+        printf("Failed to create first player texture.\n");
+        cleanup(window, renderer);
+        return EXIT_FAILURE;
+    }
+    SDL_Color color = COLOR_COSMIC_PINK;
+    score2 =createTextTexture (renderer, PATH_PREMIER ,140, "Second player", color);
+    if (!score2) 
+    {
+        printf("Failed to create texture for second player.\n");
+        cleanup(window, renderer);
+        return EXIT_FAILURE;
+    }
+    SDL_Color color = COLOR_COSMIC_PINK;
+    score3 =createTextTexture (renderer, PATH_PREMIER ,140, "Third player", color);
+    if (!score3) 
+    {
+        printf("Failed to create texture for third player.\n");
+        cleanup(window, renderer);
+        return EXIT_FAILURE;
+    }
 
 }

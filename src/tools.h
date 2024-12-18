@@ -3,13 +3,14 @@
 
 #include <SDL2/SDL.h>   
 #include <SDL2/SDL_ttf.h> // for text 
-
+/// fonts
 #define FONT_PATH_TITLE  "C:\\Users\\PHELELEP\\Documents\\GitHub\\projPolytechInfoSpaceInvaders\\fonts\\Electron.ttf"
 #define FONT_PATH_DESIGN "C:\\Users\\PHELELEP\\Documents\\GitHub\\projPolytechInfoSpaceInvaders\\fonts\\Invaders.ttf"
 #define FONT_PATH_PLAY   "C:\\Users\\PHELELEP\\Documents\\GitHub\\projPolytechInfoSpaceInvaders\\fonts\\Electron.ttf"
+#define PATH_PREMIER "C:\\Users\\PHELELEP\\Documents\\GitHub\\projPolytechInfoSpaceInvaders\\fonts\\Premier.ttf"
+/// images
 #define PATH_PLAYER "C:\\Users\\PHELELEP\\Documents\\GitHub\\projPolytechInfoSpaceInvaders\\img\\player.png"
-
-
+/// colors 
 #define COLOR_WHITE {255, 255, 255, 255}  // Bright White (Stars)
 #define COLOR_STAR_YELLOW {255, 223, 0, 255}  // Star Yellow
 #define COLOR_SUPERNOVA {255, 87, 51, 255}  // Supernova Orange-Red
@@ -33,3 +34,4 @@
 
 SDL_Texture* createTextTexture(SDL_Renderer *renderer, const char *fontPath, int fontSize, const char *text, SDL_Color color);
 
+void cleanup(SDL_Window *window, SDL_Renderer *renderer);

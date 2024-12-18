@@ -2,37 +2,21 @@
 #include <stdlib.h>  // for exit failure
 #include <SDL2/SDL.h>   
 #include <SDL2/SDL_ttf.h> // for text 
-//#include "tools.h"
 
-#include "startWindow.c"
-#include "player.c"
+// my includes
+#include "startWindow.h"
+#include "player.h"
+#include "tools.h"
 
-
-void cleanup(SDL_Window *window, SDL_Renderer *renderer) 
-{
-    printf("Cleaning up resources...\n");
-    
-    // Destroy window and renderer
-    if (window)
-    {
-        SDL_DestroyWindow(window);
-        printf("Window destroyed\n");
-    }
-    if (renderer)
-    {
-        SDL_DestroyRenderer(renderer);
-        printf("Renderer destroyed\n");
-    }
-    // Quit SDL_ttf and SDL
-    TTF_Quit(); 
-    SDL_Quit();
-}
 
 
 
 int main(int argc, char *argv[])
 {
-    SDL_Init( SDL_INIT_EVERYTHING);
+     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+        // Gestion de l'erreur d'initialisation SDL
+        return EXIT_FAILURE;
+    }
     //init
     SDL_Window *window = SDL_CreateWindow(
         "Space Invaders", 
@@ -56,12 +40,16 @@ int main(int argc, char *argv[])
         SDL_Quit();
         return EXIT_FAILURE;
     }
-
+    /// load page texture
     SDL_Texture *textTexture4Title  = NULL;
     SDL_Texture *textTexture4Design = NULL;
     SDL_Texture *textTexture4Play   = NULL;
-    SDL_Texture *playerTexture      = NULL;
-    SDL_Texture *enemyTexture       = NULL;
+    SDL_Texture *scoreboard = NULL;
+    SDL_Texture *score1 = NULL;
+    SDL_Texture *score2 = NULL;
+    SDL_Texture *score3 = NULL;
+    //SDL_Texture *playerTexture      = NULL;
+    //SDL_Texture *enemyTexture       = NULL;
     //SDL_Texture *bulletTexture      = NULL;
     //SDL_Texture *backgroundTexture  = NULL;
     //SDL_Texture *explosionTexture   = NULL;
@@ -71,6 +59,7 @@ int main(int argc, char *argv[])
     Pass pointer by value will not modify the value in the main function -  all changes in start function will be lost
     */
     createLoadPage(window, renderer, textTexture4Title, textTexture4Design, textTexture4Play);
+    createScoreBoard(window, renderer, scoreboard, score1, score2, score3);
     //createPlayer(window, renderer, playerTexture);
    
 
@@ -81,7 +70,7 @@ int main(int argc, char *argv[])
     1. add logic to ensure that the screen is updated only when necessary
     2. modify button text and colors
     */
-    SDL_Rect startButton = {WIDTH/2 -75, HEIGHT/2 - 25, 150, 50};
+    SDL_Rect startButton = {WIDTH/2 -75, HEIGHT/2 + 140, 150, 50};
     SDL_Event event;
     int gameRunning = 0;
     while (1) 

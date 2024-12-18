@@ -29,3 +29,23 @@ SDL_Texture* createTextTexture(SDL_Renderer *renderer, const char *fontPath, int
     return texture; 
 }
 
+
+void cleanup(SDL_Window *window, SDL_Renderer *renderer) 
+{
+    printf("Cleaning up resources...\n");
+    
+    // Destroy window and renderer
+    if (window)
+    {
+        SDL_DestroyWindow(window);
+        printf("Window destroyed\n");
+    }
+    if (renderer)
+    {
+        SDL_DestroyRenderer(renderer);
+        printf("Renderer destroyed\n");
+    }
+    // Quit SDL_ttf and SDL
+    TTF_Quit(); 
+    SDL_Quit();
+}
