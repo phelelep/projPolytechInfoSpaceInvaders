@@ -30,7 +30,7 @@ SDL_Texture* createTextTexture(SDL_Renderer *renderer, const char *fontPath, int
 }
 
 
-void cleanup(SDL_Window *window, SDL_Renderer *renderer) 
+int cleanup(SDL_Window *window, SDL_Renderer *renderer) 
 {
     printf("Cleaning up resources...\n");
     
@@ -48,4 +48,6 @@ void cleanup(SDL_Window *window, SDL_Renderer *renderer)
     // Quit SDL_ttf and SDL
     TTF_Quit(); 
     SDL_Quit();
+
+    return EXIT_SUCCESS;
 }

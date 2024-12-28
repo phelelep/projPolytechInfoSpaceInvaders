@@ -11,6 +11,7 @@
 
 
 
+
 int main(int argc, char *argv[])
 {
      if (SDL_Init(SDL_INIT_VIDEO) < 0) {
@@ -40,74 +41,40 @@ int main(int argc, char *argv[])
         SDL_Quit();
         return EXIT_FAILURE;
     }
-    /// load page texture
-    SDL_Texture *textTexture4Title  = NULL;
-    SDL_Texture *textTexture4Design = NULL;
-    SDL_Texture *textTexture4Play   = NULL;
-    SDL_Texture *scoreboard = NULL;
-    SDL_Texture *score1 = NULL;
-    SDL_Texture *score2 = NULL;
-    SDL_Texture *score3 = NULL;
-    //SDL_Texture *playerTexture      = NULL;
-    //SDL_Texture *enemyTexture       = NULL;
-    //SDL_Texture *bulletTexture      = NULL;
-    //SDL_Texture *backgroundTexture  = NULL;
-    //SDL_Texture *explosionTexture   = NULL;
-    //SDL_Texture *obstacleTexture    = NULL;
-    //SDL_Texture *gameOverTexture    = NULL;
-    /*
-    Pass pointer by value will not modify the value in the main function -  all changes in start function will be lost
-    */
-    createLoadPage(window, renderer, textTexture4Title, textTexture4Design, textTexture4Play);
-    createScoreBoard(window, renderer, scoreboard, score1, score2, score3);
-    //createPlayer(window, renderer, playerTexture);
    
-
-
-
     // game loop
     /*todo
     1. add logic to ensure that the screen is updated only when necessary
     2. modify button text and colors
     */
-    SDL_Rect startButton = {WIDTH/2 -75, HEIGHT/2 + 140, 150, 50};
+    
     SDL_Event event;
-    int gameRunning = 0;
+
+    GameState state = LOAD_PAGE;
     while (1) 
     {
       while (SDL_PollEvent(&event))
       {
         if (event.type == SDL_QUIT)
         {
-            cleanup(window, renderer);
-            return EXIT_SUCCESS;
+            state = GAME_OVER;
         }
-        else if (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT) 
+        switch (state)
         {
-            int mouseX= event.button.x; // horizontal plan
-            int mouseY= event.button.y; // vertical plan
-
-            //check if the mouse was pressed inside the button 
-            if (mouseX>= startButton.x && mouseX <=(startButton.x + startButton.w) && 
-                mouseY>= startButton.y && mouseY <=(startButton.y)+ startButton.h)
-                {   
-                    printf("Button clicked\n");
-                    gameRunning = 1;
-                    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // to change color game is started
-                    SDL_RenderClear(renderer);
-                    SDL_RenderPresent(renderer); // updates the screen
-                    SDL_DestroyTexture(textTexture4Title);
-                    SDL_DestroyTexture(textTexture4Design);
-                    SDL_DestroyTexture(textTexture4Play);
-                }
-
-        }
-        if (gameRunning)
-        {
-
+            case LOAD_PAGE :
+                createLoadPage(window, renderer);
+                handleLoadPage(window, renderer, &event, &state);
+                break;
+            case GAME_STARTED :
+                gameStarted(window, renderer);
+                 //createPlayer(window, renderer, playerTexture);
+                break;
+            case GAME_OVER:
+                cleanup(window, renderer);
+                break; 
         }
       }
     }
-    SDL_Delay(45); // ~25 FPS to reduce CPU usage
+    SDL_Delay(450); // ~25 FPS to reduce CPU usage
 
 } 
