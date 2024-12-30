@@ -13,6 +13,7 @@
                 "${workspaceFolder}/src/startWindow.c",
                 "${workspaceFolder}/src/tools.c",
                 "${workspaceFolder}/src/player.c",
+                "${workspaceFolder}/src/game.c",
                 "-o",
                 "${workspaceFolder}/bin/main",
                 "-I${workspaceFolder}/lib/include",

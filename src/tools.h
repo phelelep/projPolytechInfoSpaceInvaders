@@ -34,4 +34,11 @@
 
 SDL_Texture* createTextTexture(SDL_Renderer *renderer, const char *fontPath, int fontSize, const char *text, SDL_Color color);
 
-void cleanup(SDL_Window *window, SDL_Renderer *renderer);
+int cleanup(SDL_Window *window, SDL_Renderer *renderer);
+
+typedef enum 
+{
+    LOAD_PAGE,
+    GAME_STARTED,
+    GAME_OVER
+}GameState;
