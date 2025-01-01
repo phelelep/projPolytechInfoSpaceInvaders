@@ -2,7 +2,7 @@
 #include <stdio.h>
 
 
-int createLoadPage(SDL_Window *window, SDL_Renderer *renderer)
+int createLoadPage(SDL_Window **window, SDL_Renderer **renderer, SDL_Event *event, GameState *state)
 {
     TTF_Init(); // for text
 
@@ -49,39 +49,35 @@ int createLoadPage(SDL_Window *window, SDL_Renderer *renderer)
     SDL_Rect textRectPlay = {WIDTH/2 -70, HEIGHT/2 + 160, 140, 45};  
 
     // init screen
-    SDL_SetRenderDrawColor (renderer, 18,15,109,255); // fill screen with color
-    SDL_RenderClear(renderer);
+    SDL_SetRenderDrawColor (*renderer, 18,15,109,255); // fill screen with color
+    SDL_RenderClear(*renderer);
 
     // start button 
-    SDL_SetRenderDrawColor(renderer, 32, 130, 100, 255); 
-    SDL_RenderFillRect(renderer, &startButton); // asign the button to the var startButton
+    SDL_SetRenderDrawColor(*renderer, 32, 130, 100, 255); 
+    SDL_RenderFillRect(*renderer, &startButton); // asign the button to the var startButton
     
 
     /*
     This function renders the SDL_Texture (created from text surface) onto the screen at the position and size specified by the SDL_Rect
     */
-    SDL_RenderCopy(renderer, textTexture4Title, NULL, &textRectTitle);
-    SDL_RenderCopy(renderer, textTexture4Design, NULL, &textRectDesign);
-    SDL_RenderCopy(renderer, textTexture4Play, NULL, &textRectPlay);
+    SDL_RenderCopy(*renderer, textTexture4Title, NULL, &textRectTitle);
+    SDL_RenderCopy(*renderer, textTexture4Design, NULL, &textRectDesign);
+    SDL_RenderCopy(*renderer, textTexture4Play, NULL, &textRectPlay);
 
 
-
-    SDL_RenderPresent(renderer); // to update the screen
-
-    /*
-    renderer is update textures no longer needed - free memory
-    */
-    printf("Destroying textures for scoreboard\n");  
+    createScoreBoard(window, renderer, event, state);
+   
+    printf("Destroying textures for text\n");  
     SDL_DestroyTexture(textTexture4Title);
     SDL_DestroyTexture(textTexture4Design);
     SDL_DestroyTexture(textTexture4Play);
 
 
-    createScoreBoard(window, renderer);
+    return 0;
 
 }
 
-int createScoreBoard(SDL_Window *window, SDL_Renderer *renderer)
+int createScoreBoard(SDL_Window **window, SDL_Renderer **renderer, SDL_Event *event, GameState *state)
 {
     // text for the Scoreboard
     SDL_Color color = COLOR_PLANETARY_BLUE;
@@ -132,49 +128,65 @@ int createScoreBoard(SDL_Window *window, SDL_Renderer *renderer)
      /*
     This function renders the SDL_Texture (created from text surface) onto the screen at the position and size specified by the SDL_Rect
     */
-    SDL_RenderCopy(renderer, scoreboard, NULL, &scoreboardrect);
-    SDL_RenderCopy(renderer, score1, NULL, &score1rect);
-    SDL_RenderCopy(renderer, score2, NULL, &score2rect);
-    SDL_RenderCopy(renderer, score3, NULL, &score3rect);    
+    SDL_RenderCopy(*renderer, scoreboard, NULL, &scoreboardrect);
+    SDL_RenderCopy(*renderer, score1, NULL, &score1rect);
+    SDL_RenderCopy(*renderer, score2, NULL, &score2rect);
+    SDL_RenderCopy(*renderer, score3, NULL, &score3rect);    
 
 
 
-    SDL_RenderPresent(renderer); // to update the screen
+    SDL_RenderPresent(*renderer); // to update the screen // affichage de merde
 
-
+    handlePlayButton(event, state);
 
     printf("Destroying textures for scoreboard\n");
     SDL_DestroyTexture(scoreboard);
     SDL_DestroyTexture(score1);
     SDL_DestroyTexture(score2);
     SDL_DestroyTexture(score3);
+
+    return 0;
 }
 /*
-Yes, you are correct. By passing the event and state variables by reference, you avoid creating unnecessary copies 
+By passing the event and state variables by reference, you avoid creating unnecessary copies 
 and allow the called function to modify the original variables in the caller function.
 */
 
-int handleLoadPage(SDL_Window *window, SDL_Renderer *renderer, SDL_Event *event, GameState *state)
+void handlePlayButton(SDL_Event *event, GameState *state)
 {
     SDL_Rect startButton = {WIDTH/2 -75, HEIGHT/2 + 160, 150, 50};
 
+    while (*state == LOAD_PAGE)
+    {
+        while (SDL_PollEvent(event))
+        {
+            printf("State is in load page\n");
+            if (event->type == SDL_QUIT)
+            {
+                *state = GAME_OVER;
+                return;
+            }
+            else if (event->type == SDL_MOUSEBUTTONDOWN && event->button.button == SDL_BUTTON_LEFT) 
+            { 
+                printf("In the event mouse button down\n");
+                int mouseX= event->button.x; // horizontal plan
+                int mouseY= event->button.y; // vertical plan
 
-    if (event->type == SDL_MOUSEBUTTONDOWN && event->button.button == SDL_BUTTON_LEFT) 
-        { 
-            int mouseX= event->button.x; // horizontal plan
-            int mouseY= event->button.y; // vertical plan
-
-            //check if the mouse was pressed inside the button 
-            if (mouseX>= startButton.x && mouseX <=(startButton.x + startButton.w) && 
-                mouseY>= startButton.y && mouseY <=(startButton.y)+ startButton.h)
+                //check if the mouse was pressed inside the button 
+                if (mouseX>= startButton.x && mouseX <=(startButton.x + startButton.w) && 
+                    mouseY>= startButton.y && mouseY <=(startButton.y)+ startButton.h)
                 {  
-                    printf("Button clicked\n");
-                  
+                    printf("Button play clicked\n");
+                    
                     *state = GAME_STARTED;
-                    //SDL_RenderClear(renderer);
-                    //SDL_RenderPresent(renderer); // updates the screen
-                   
+                    return;
+                    
                 }
 
+            }
         }
+        SDL_Delay(100); // ~FPS every 100ms listens to the event
+    }
+
+    
 }

@@ -1,15 +1,20 @@
 
 #pragma once
 
+
 #include <SDL2/SDL.h>   
 #include <SDL2/SDL_ttf.h> // for text 
 /// fonts
-#define FONT_PATH_TITLE  "C:\\Users\\PHELELEP\\Documents\\GitHub\\projPolytechInfoSpaceInvaders\\fonts\\Electron.ttf"
-#define FONT_PATH_DESIGN "C:\\Users\\PHELELEP\\Documents\\GitHub\\projPolytechInfoSpaceInvaders\\fonts\\Invaders.ttf"
-#define FONT_PATH_PLAY   "C:\\Users\\PHELELEP\\Documents\\GitHub\\projPolytechInfoSpaceInvaders\\fonts\\Electron.ttf"
-#define PATH_PREMIER "C:\\Users\\PHELELEP\\Documents\\GitHub\\projPolytechInfoSpaceInvaders\\fonts\\Premier.ttf"
+#define FONT_PATH_TITLE  "/Users/phelelep/Desktop/ProgProjGit/projPolytechInfoSpaceInvaders/fonts/Electron.ttf"
+#define FONT_PATH_DESIGN "/Users/phelelep/Desktop/ProgProjGit/projPolytechInfoSpaceInvaders/fonts/Invaders.ttf"
+#define FONT_PATH_PLAY   "/Users/phelelep/Desktop/ProgProjGit/projPolytechInfoSpaceInvaders/fonts/Electron.ttf"
+#define PATH_PREMIER "/Users/phelelep/Desktop/ProgProjGit/projPolytechInfoSpaceInvaders/fonts/Premier.ttf"
 /// images
-#define PATH_PLAYER "C:\\Users\\PHELELEP\\Documents\\GitHub\\projPolytechInfoSpaceInvaders\\img\\player.png"
+#define PATH_PLAYER "/Users/phelelep/Desktop/ProgProjGit/projPolytechInfoSpaceInvaders/img/player.png"
+#define PATH_ENEMY_GREEN "/Users/phelelep/Desktop/ProgProjGit/projPolytechInfoSpaceInvaders/img/enemy.png"
+#define PATH_ENEMY_RED "/Users/phelelep/Desktop/ProgProjGit/projPolytechInfoSpaceInvaders/img/enemyRed.png"
+#define PATH_ENEMY_ROSE "/Users/phelelep/Desktop/ProgProjGit/projPolytechInfoSpaceInvaders/img/enemyRose.png"
+#define PATH_HOME "/Users/phelelep/Desktop/ProgProjGit/projPolytechInfoSpaceInvaders/img/home.png"
 /// colors 
 #define COLOR_WHITE {255, 255, 255, 255}  // Bright White (Stars)
 #define COLOR_STAR_YELLOW {255, 223, 0, 255}  // Star Yellow
@@ -32,9 +37,11 @@
 
 
 
-SDL_Texture* createTextTexture(SDL_Renderer *renderer, const char *fontPath, int fontSize, const char *text, SDL_Color color);
+SDL_Texture* createTextTexture(SDL_Renderer **renderer, const char *fontPath, int fontSize, const char *text, SDL_Color color);
+SDL_Texture* createTexture(SDL_Window **window, SDL_Renderer **renderer, const char *filePath);
 
-int cleanup(SDL_Window *window, SDL_Renderer *renderer);
+
+void cleanup(SDL_Window **window, SDL_Renderer **renderer);
 
 typedef enum 
 {
