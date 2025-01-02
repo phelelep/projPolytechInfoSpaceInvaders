@@ -5,8 +5,6 @@
 #include "tools.h"
 
 
-
-
 SDL_Texture* createTextTexture(SDL_Renderer **renderer, const char *fontPath, int fontSize, const char *text, SDL_Color color) 
 {
     TTF_Font *font = TTF_OpenFont(fontPath, fontSize);

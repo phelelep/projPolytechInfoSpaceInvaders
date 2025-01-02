@@ -1,47 +1,50 @@
 #pragma once
 #include <SDL2/SDL.h>  
 
+
+
 int gameStarted(
     SDL_Window **window, 
     SDL_Renderer **renderer, 
     SDL_Event *event, 
     GameState *state);
 
+//If you don’t use typedef, you need to refer to the structure using struct bullet every time:
 
-void createEnemyTextures(
-    SDL_Window **window, 
-    SDL_Renderer **renderer,
-    SDL_Texture **enemyGreenTextures, // pointer to array 
-    SDL_Texture **enemyRedTextures,
-    SDL_Texture **enemyRoseTextures, 
-    int *enemyGreenLives,
-    int *enemyRedLives,
-    int *enemyRoseLives,
-    int nrEnemyGreen,
-    int nrEnemyRed,
-    int nrEnemyRose);
+typedef struct 
+{
+    SDL_Texture *texture;
+    SDL_Rect rect;
+    int lives;
+}Player;
 
-void handleEnemy(
-    SDL_Window **window, 
-    SDL_Renderer **renderer,
-    SDL_Texture **enemyGreenTextures, // pointer to array 
-    SDL_Texture **enemyRedTextures,
-    SDL_Texture **enemyRoseTextures, 
-    int *enemyGreenLives,
-    int *enemyRedLives,
-    int *enemyRoseLives,
-    int nrEnemyGreen,
-    int nrEnemyRed,
-    int nrEnemyRose,
-    int indexEnemyTouched,
-    double enemyPosition);
+typedef struct
+{
+    SDL_Texture *texture;
+    SDL_Rect rect;
+    int active;
+}Heart;
 
-void destroyEnemyTextures(
-    SDL_Texture **enemyGreenTextures, 
-    SDL_Texture **enemyRedTextures, 
-    SDL_Texture **enemyRoseTextures,
-    int nrEnemyGreen,
-    int nrEnemyRed,
-    int nrEnemyRose);
+
+typedef struct 
+{
+    SDL_Texture *texture;
+    SDL_Rect rect;
+    int active;
+}Bullet;
+
+
+void asteroidDestroyer(
+    SDL_Texture **homeButton, 
+    SDL_Texture **score, 
+    SDL_Texture **playerTexture, 
+    Bullet *bullets, 
+    Heart *hearts, 
+    int nrBullets, 
+    int playerLives);
+
+void handleHeart(SDL_Renderer **renderer, Heart *heart, int playerLives);
+void handleBullets(SDL_Renderer **renderer, Bullet *bullet, int nrBullets);
+
 
    

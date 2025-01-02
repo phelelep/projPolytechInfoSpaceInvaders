@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "tools.h"
 #include "game.h"
+#include "enemy.h"
 
 int gameStarted(SDL_Window **window, SDL_Renderer **renderer, SDL_Event *event, GameState *state)
 {   
@@ -14,26 +15,46 @@ int gameStarted(SDL_Window **window, SDL_Renderer **renderer, SDL_Event *event, 
     
     
     // player
-    int playerLives = 2;
-    SDL_Texture *playerTexture = createTexture(window, renderer, PATH_PLAYER);
+    Player player;
+    player.texture = createTexture(window, renderer, PATH_PLAYER);
+    player.rect = (SDL_Rect){WIDTH/2 - 50, HEIGHT - 50, 40, 35};
+    player.lives = 3;
+    Heart heart[player.lives];
+    for (int i = 0; i < player.lives; i++)
+    {  
+        heart[i].texture = createTexture(window, renderer, PATH_HEART);
+        heart[i].rect = (SDL_Rect){20 + i*30,HEIGHT- 40, 20, 20};
+        heart[i].active = 1;
+    }
+    
+    //bullets
+    int nrBullets = 9;
+    int indexBullet = 0;
+    Bullet bullet[nrBullets];
+    for (int i =0; i<nrBullets; i++)
+    {
+        bullet[i].texture = createTexture(window, renderer, PATH_BULLET);
+        bullet[i].rect.w = 15;
+        bullet[i].rect.h = 15;
+        bullet[i].active = 0;
+    }
+ 
+
 
     //enemy
     int nrEnemyGreen = 8;
     int nrEnemyRed = 5;
     int nrEnemyRose = 4;
     int indexEnemyTouched= -1;
-    SDL_Texture *enemyGreenTextures [nrEnemyGreen];
-    SDL_Texture *enemyRedTextures [nrEnemyRed];
-    SDL_Texture *enemyRoseTextures [nrEnemyRose];
-    int enemyGreenLives[nrEnemyGreen];
-    int enemyRedLives[nrEnemyRed];
-    int enemyRoseLives[nrEnemyRose];
+
+    enemyGreen green[nrEnemyGreen];
+    enemyRed red[nrEnemyRed];
+    enemyRose rose[nrEnemyRose];
 
 
 
     createEnemyTextures(window, renderer, 
-                enemyGreenTextures, enemyRedTextures, enemyRoseTextures, 
-                enemyGreenLives, enemyRedLives, enemyRoseLives,
+                green, red, rose,
                 nrEnemyGreen, nrEnemyRed, nrEnemyRose);
 
 
@@ -41,8 +62,7 @@ int gameStarted(SDL_Window **window, SDL_Renderer **renderer, SDL_Event *event, 
    // SDL_Rect homeColorButtonRect = {20, 20 , 50, 50};
     SDL_Rect scoreRect = {WIDTH - 150, 20, 70, 25};
     SDL_Rect homeButtonRect = {20, 20 , 50, 50}; // x posiiton départ ,y ,width,hight 
-    SDL_Rect playerRect = {WIDTH/2 - 50, HEIGHT - 50, 40, 35}; // x position, y position, width, height
- 
+
     double enemyPosition = 0;
     int enemyDirection =1;
     while (*state == GAME_STARTED) 
@@ -53,12 +73,8 @@ int gameStarted(SDL_Window **window, SDL_Renderer **renderer, SDL_Event *event, 
             {
                 *state = GAME_OVER;
                 /// --- CLEANUP --- ///
-                printf("Destroying textures\n");  
-                SDL_DestroyTexture(homeButton);
-                SDL_DestroyTexture(playerTexture);
-                SDL_DestroyTexture(score);
-                destroyEnemyTextures(enemyGreenTextures, enemyRedTextures, enemyRoseTextures, nrEnemyGreen, nrEnemyRed, nrEnemyRose);
-
+                asteroidDestroyer(&homeButton, &score, &player.texture, bullet, heart, nrBullets, player.lives);
+                destroyEnemyTextures(green, red, rose, nrEnemyGreen, nrEnemyRed, nrEnemyRose);
                 return 0;
             }
             else if (event->type == SDL_MOUSEBUTTONDOWN && event->button.button == SDL_BUTTON_LEFT) 
@@ -69,16 +85,10 @@ int gameStarted(SDL_Window **window, SDL_Renderer **renderer, SDL_Event *event, 
                     mouseY>= homeButtonRect.y && mouseY <=(homeButtonRect.y)+ homeButtonRect.h)
                 {  
                     printf("Exit button clicked\n");
-                
                     *state = LOAD_PAGE;
-
-                        /// --- CLEANUP --- ///
-                    printf("Destroying textures\n");  
-                    SDL_DestroyTexture(homeButton);
-                    SDL_DestroyTexture(playerTexture);
-                    SDL_DestroyTexture(score);
-                    destroyEnemyTextures(enemyGreenTextures, enemyRedTextures, enemyRoseTextures, nrEnemyGreen, nrEnemyRed, nrEnemyRose);
-
+                    /// --- CLEANUP --- ///
+                    asteroidDestroyer(&homeButton, &score, &player.texture, bullet, heart, nrBullets, player.lives);
+                    destroyEnemyTextures(green, red, rose, nrEnemyGreen, nrEnemyRed, nrEnemyRose);
                     return 0;
                 }
             }
@@ -89,12 +99,18 @@ int gameStarted(SDL_Window **window, SDL_Renderer **renderer, SDL_Event *event, 
                 switch (event->key.keysym.sym)
                 {
                      case SDLK_LEFT:
-                        if (playerRect.x > 0) 
-                            playerRect.x -= 14; 
+                        if (player.rect.x > 0) 
+                            player.rect.x -= 14; 
                         break;
                     case SDLK_RIGHT:
-                        if (playerRect.x < (WIDTH - playerRect.w))
-                            playerRect.x += 14;
+                        if (player.rect.x < (WIDTH - player.rect.w))
+                            player.rect.x += 14;
+                        break;
+                    case SDLK_SPACE :
+                        bullet[indexBullet].rect.x = player.rect.x + 13;
+                        bullet[indexBullet].rect.y = player.rect.y - 10;
+                        bullet[indexBullet].active = 1;
+                        indexBullet = (indexBullet + 1) % nrBullets; // when Bullets = max -> Bullets =0
                         break;
                 }
             }
@@ -102,31 +118,27 @@ int gameStarted(SDL_Window **window, SDL_Renderer **renderer, SDL_Event *event, 
        
         SDL_Delay(20); 
         
-       if (enemyPosition >=15)
-       {
-        enemyDirection = -1; // direction opposé
-        printf("1-enemyDirection : %d\n", enemyDirection);
-       }
-       else if (enemyPosition <= -15)
-       {
-         enemyDirection  =1;
-         printf("2-enemyDirection : %d\n", enemyDirection);
-       }
-        
-        enemyPosition += enemyDirection*0.35;
-        printf("EnemyPositon : %f\n", enemyPosition);
-       
-         // Clear the renderer and redraw everything
+        /// --- enemy movement
+        enemyPosition = handleEnemyPosition(enemyPosition, &enemyDirection);
+
+
+        /// --- Clear the renderer and redraw everything
         SDL_SetRenderDrawColor(*renderer, 0, 0, 0, 255); // Set to black
         SDL_RenderClear(*renderer);
 
         SDL_RenderCopy(*renderer, homeButton, NULL, &homeButtonRect);
         SDL_RenderCopy(*renderer, score, NULL, &scoreRect);
-        SDL_RenderCopy(*renderer, playerTexture, NULL, &playerRect);
-        
+        SDL_RenderCopy(*renderer, player.texture, NULL, &player.rect);
+
+
+        handleHeart(renderer, heart, player.lives);
+       
+        handleBullets(renderer, bullet, nrBullets);
+
+       // checkCollision(bullet, nrBullets, enemyGreenRect, enemyGreenLives, nrEnemyGreen);
+
         handleEnemy(window, renderer,
-                    enemyGreenTextures, enemyRedTextures, enemyRoseTextures,
-                    enemyGreenLives, enemyRedLives, enemyRoseLives,
+                    green, red, rose,
                     nrEnemyGreen, nrEnemyRed, nrEnemyRose, indexEnemyTouched,
                     enemyPosition);
         SDL_RenderPresent(*renderer); // to update the screen
@@ -136,119 +148,73 @@ int gameStarted(SDL_Window **window, SDL_Renderer **renderer, SDL_Event *event, 
 }
 
 
- void createEnemyTextures(
-    SDL_Window **window, 
-    SDL_Renderer **renderer,
-    SDL_Texture **enemyGreenTextures, // pointer to array 
-    SDL_Texture **enemyRedTextures,
-    SDL_Texture **enemyRoseTextures, 
-    int *enemyGreenLives,
-    int *enemyRedLives,
-    int *enemyRoseLives,
-    int nrEnemyGreen,
-    int nrEnemyRed,
-    int nrEnemyRose)
-{
 
-    
-    for (int i = 0; i < nrEnemyGreen; i++)
-    {
-        enemyGreenTextures[i] = createTexture(window, renderer, PATH_ENEMY_GREEN);
-        enemyGreenLives[i] = 2;
+
+void asteroidDestroyer(
+    SDL_Texture **homeButton, 
+    SDL_Texture **score, 
+    SDL_Texture **playerTexture, 
+    Bullet *bullets, 
+    Heart *hearts, 
+    int nrBullets, 
+    int playerLives)
+{
+    // Exemple de destruction des textures
+    if (*homeButton) {
+        printf("Destroying home button texture\n");
+        SDL_DestroyTexture(*homeButton);
+        *homeButton = NULL;
     }
-    for (int i = 0; i < nrEnemyRed; i++)
-    {
-        enemyRedTextures[i] = createTexture(window, renderer, PATH_ENEMY_RED);
-        enemyRedLives[i] = 3;
+    if (*score) {
+        printf("Destroying score texture\n");
+        SDL_DestroyTexture(*score);
+        *score = NULL;
     }
-    for (int i = 0; i < nrEnemyRose; i++)
-    {
-        enemyRoseTextures[i] = createTexture(window, renderer, PATH_ENEMY_ROSE);
-        enemyRoseLives[i] = 1;
+    if (*playerTexture) {
+        printf("Destroying player texture\n");
+        SDL_DestroyTexture(*playerTexture);
+        *playerTexture = NULL;
+    }
+
+    for (int i = 0; i < nrBullets; i++) {
+        if (bullets[i].texture) {
+            printf("Destroying bullet texture %d\n",i);
+            SDL_DestroyTexture(bullets[i].texture);
+            bullets[i].texture = NULL;
+        }
+    }
+
+    for (int i = 0; i < playerLives; i++) {
+        if (hearts[i].texture) {
+            printf("Destroying heart texture %d\n", i);
+            SDL_DestroyTexture(hearts[i].texture);
+            hearts[i].texture = NULL;
+        }
     }
 }
 
-void handleEnemy(
-    SDL_Window **window, 
-    SDL_Renderer **renderer,
-    SDL_Texture **enemyGreenTextures, // pointer to array 
-    SDL_Texture **enemyRedTextures,
-    SDL_Texture **enemyRoseTextures,
-    int *enemyGreenLives,
-    int *enemyRedLives,
-    int *enemyRoseLives,
-    int nrEnemyGreen,
-    int nrEnemyRed,
-    int nrEnemyRose, 
-    int indexEnemyTouched,
-    double enemyPosition)
+void handleHeart(SDL_Renderer **renderer, Heart *heart, int playerLives)
 {
-
-    /// --- GREEN ENEMY --- ///
-    SDL_Rect enemyGreenRects[nrEnemyGreen];
-    SDL_Rect enemyRedRects[nrEnemyRed];
-    SDL_Rect enemyRoseRects[nrEnemyRose];
-    int nrEnemyGreenLives[nrEnemyGreen];
-    int nrEnemyRedLives[nrEnemyRed];
-    int nrEnemyRoseLives[nrEnemyRose];
+     for (int i=0; i<playerLives; i++)
+            if (heart[i].active)
+                SDL_RenderCopy(*renderer, heart[i].texture, NULL, &heart[i].rect);
     
-    int spacing = 30;
-    int totalWidthGreen = nrEnemyGreen *50 + (nrEnemyGreen - 1) * spacing;
-    int startGreen = (WIDTH - totalWidthGreen) / 2;
-
-    int totalWidthRed = nrEnemyRed *80 + (nrEnemyRed - 1) * spacing;
-    int startRed = (WIDTH - totalWidthRed) / 2;
-
-    int totalWidthRose = nrEnemyRose *50 + (nrEnemyRose - 1) * spacing;
-    int startRose = (WIDTH - totalWidthRose) / 2;
-   
-    for (int i =0 ; i< nrEnemyGreen; i++)
-    {
-        SDL_Rect tempRect = {startGreen + i*(spacing+50)+ enemyPosition, 300, 50, 50}; //use temps rect de modify this shit
-        enemyGreenRects[i] = tempRect;
-        SDL_RenderCopy(*renderer, enemyGreenTextures[i], NULL, &enemyGreenRects[i]);
-    }
-    for (int i =0 ; i< nrEnemyRed; i++)
-    {
-        SDL_Rect tempRect2 ={startRed + i*(spacing+80)+ enemyPosition, 200, 80, 50};
-        enemyRedRects[i] = tempRect2;
-        SDL_RenderCopy(*renderer, enemyRedTextures[i], NULL, &enemyRedRects[i]);
-    }
-    for (int i =0 ; i< nrEnemyRose; i++)
-    {
-        SDL_Rect tempRect3 ={startRose + i*(spacing+50)+ enemyPosition, 100, 50, 50};
-        enemyRoseRects[i] = tempRect3;
-        SDL_RenderCopy(*renderer, enemyRoseTextures[i], NULL, &enemyRoseRects[i]);
-    }
 }
 
-void destroyEnemyTextures(SDL_Texture **enemyGreenTextures, 
-                    SDL_Texture **enemyRedTextures, 
-                    SDL_Texture **enemyRoseTextures,
-                    int nrEnemyGreen,
-                    int nrEnemyRed,
-                    int nrEnemyRose)
-
+void handleBullets(SDL_Renderer **renderer, Bullet *bullet, int nrBullets)
 {
-    for (int i = 0; i < nrEnemyGreen; i++) {
-        if (enemyGreenTextures[i] != NULL) {
-            SDL_DestroyTexture(enemyGreenTextures[i]);
-            enemyGreenTextures[i] = NULL;
-            printf("enemyGreenTextures[%d] destroyed\n", i);
+    for (int i =0; i<nrBullets; i++)
+    {
+        if (bullet[i].active)
+        {
+            if (bullet[i].rect.y > 30)
+            {
+                bullet[i].rect.y -=4;
+                SDL_RenderCopy(*renderer, bullet[i].texture, NULL, &bullet[i].rect);
+            }
+            else 
+                bullet[i].active = 0;
         }
-    }
-    for (int i = 0; i < nrEnemyRed; i++) {
-        if (enemyRedTextures[i] != NULL) {
-            SDL_DestroyTexture(enemyRedTextures[i]);
-            enemyRedTextures[i] = NULL;
-            printf("enemyRedTextures[%d] destroyed\n", i);
-        }
-    }
-    for (int i = 0; i < nrEnemyRose; i++) {
-        if (enemyRedTextures[i] != NULL) {
-            SDL_DestroyTexture(enemyRedTextures[i]);
-            enemyRedTextures[i] = NULL;
-            printf("enemyRoseTextures[%d] destroyed\n", i);
-        }
+    
     }
 }
