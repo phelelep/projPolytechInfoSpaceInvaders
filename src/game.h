@@ -1,6 +1,6 @@
 #pragma once
 #include <SDL2/SDL.h>  
-
+#include "enemy.h"
 
 
 int gameStarted(
@@ -45,6 +45,29 @@ void asteroidDestroyer(
 
 void handleHeart(SDL_Renderer **renderer, Heart *heart, int playerLives);
 void handleBullets(SDL_Renderer **renderer, Bullet *bullet, int nrBullets);
+
+
+int checkCollisionEnemy(
+    Bullet *bullets, 
+    int nrBullets,
+    enemyGreen *green, 
+    enemyRed *red, 
+    enemyRose *rose, 
+    int nrEnemyGreen, 
+    int nrEnemyRed, 
+    int nrEnemyRose,
+    int *nrTotalDeadEnemy);
+
+int checkCollisionPlayer(
+    Player player, 
+    BulletEnemy *bulletsEnemyGreen, 
+    BulletEnemy *bulletsEnemyRed, 
+    BulletEnemy *bulletsEnemyRose, 
+    int nrEnemyGreen, int nrEnemyRed, int nrEnemyRose);
+
+int handlePlayerTouched(SDL_Renderer **renderer, int *playerTouched, Player *player, Heart *heart);
+
+void handleLevelPassed (SDL_Renderer **renderer, int levelPassed, SDL_Color color);
 
 
    

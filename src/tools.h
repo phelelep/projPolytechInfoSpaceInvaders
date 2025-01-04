@@ -17,6 +17,9 @@
 #define PATH_ENEMY_ROSE "/Users/phelelep/Desktop/ProgProjGit/projPolytechInfoSpaceInvaders/img/enemyRose.png"
 #define PATH_HOME "/Users/phelelep/Desktop/ProgProjGit/projPolytechInfoSpaceInvaders/img/home.png"
 #define PATH_HEART "/Users/phelelep/Desktop/ProgProjGit/projPolytechInfoSpaceInvaders/img/heart.png"
+#define PATH_BULLET_ENEMY_GREEN "/Users/phelelep/Desktop/ProgProjGit/projPolytechInfoSpaceInvaders/img/BulletEnemy.png"
+#define PATH_BULLET_ENEMY_RED "/Users/phelelep/Desktop/ProgProjGit/projPolytechInfoSpaceInvaders/img/BulletEnemy2.png"
+#define PATH_BULLET_ENEMY_ROSE "/Users/phelelep/Desktop/ProgProjGit/projPolytechInfoSpaceInvaders/img/BulletEnemy3.png"
 /// colors 
 #define COLOR_WHITE {255, 255, 255, 255}  // Bright White (Stars)
 #define COLOR_STAR_YELLOW {255, 223, 0, 255}  // Star Yellow
