@@ -178,7 +178,6 @@ void handleBulletsEnemy(SDL_Renderer **renderer,
     {
         if (enemyBulletsGreen[i].active)
         {
-            printf("Bullet %d active\n", i);
             enemyBulletsGreen[i].rect.y += 1;
             SDL_RenderCopy(*renderer, enemyBulletsGreen[i].texture,NULL, &enemyBulletsGreen[i].rect);
 

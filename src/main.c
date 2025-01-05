@@ -44,6 +44,7 @@ int main(int argc, char *argv[])
     1. add logic to ensure that the screen is updated only when necessary
     2. modify button text and colors
     */
+    User player1;
     SDL_Event event;
 
     GameState state = LOAD_PAGE;
@@ -60,10 +61,10 @@ int main(int argc, char *argv[])
         switch (state)
         {
             case LOAD_PAGE :
-                createLoadPage(&window, &renderer, &event, &state);
+                createLoadPage(&window, &renderer, &event, &state, &player1);
                 break;
             case GAME_STARTED :
-                gameStarted(&window, &renderer, &event, &state);
+                gameStarted(&window, &renderer, &event, &state, &player1);
                 break;
             case GAME_OVER:
                 cleanup(&window, &renderer);

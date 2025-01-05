@@ -2,13 +2,17 @@
 #include "tools.h"
 #include "game.h"
 #include "enemy.h"
+#include "player.h"
 
-int gameStarted(SDL_Window **window, SDL_Renderer **renderer, SDL_Event *event, GameState *state)
+int gameStarted(SDL_Window **window, SDL_Renderer **renderer, SDL_Event *event, GameState *state, User *player1)
 {   
     
     // home button
     SDL_Color color = COLOR_PLANETARY_BLUE;
-    SDL_Texture *score = createTextTexture(renderer, PATH_PREMIER, 50, "Score", color);
+
+    Score score;
+    score.color = color;
+    score.texture = createTextTexture(renderer, PATH_PREMIER, 50, "Score : 0", score.color);
 
     // home button
     SDL_Texture *homeButton= createTexture(window, renderer, PATH_HOME);    
@@ -42,9 +46,9 @@ int gameStarted(SDL_Window **window, SDL_Renderer **renderer, SDL_Event *event, 
 
 
     /// --- enemy --- ///
-    int nrEnemyGreen = 2;
-    int nrEnemyRed = 2;
-    int nrEnemyRose = 2;
+    int nrEnemyGreen = 4;
+    int nrEnemyRed = 4;
+    int nrEnemyRose = 5;
 
     enemyGreen green[nrEnemyGreen];
     enemyRed red[nrEnemyRed];
@@ -63,8 +67,8 @@ int gameStarted(SDL_Window **window, SDL_Renderer **renderer, SDL_Event *event, 
 
 
     /// --- RECTS --- ///
-   // SDL_Rect homeColorButtonRect = {20, 20 , 50, 50};
-    SDL_Rect scoreRect = {WIDTH - 150, 20, 70, 25};
+    // SDL_Rect homeColorButtonRect = {20, 20 , 50, 50};
+    score.rect = (SDL_Rect) {WIDTH - 150, 20, 90, 30};
     SDL_Rect homeButtonRect = {20, 20 , 50, 50}; // x posiiton départ ,y ,width,hight 
 
 
@@ -83,6 +87,7 @@ int gameStarted(SDL_Window **window, SDL_Renderer **renderer, SDL_Event *event, 
             if (event->type == SDL_QUIT)  //quited
             {
                 *state = GAME_OVER;
+                saveScore(player1, &score);
                 /// --- CLEANUP --- ///
                 asteroidDestroyer(&homeButton, &score, &player.texture, bullet, heart, nrBullets, player.lives);
                 destroyEnemyTextures(green, red, rose, nrEnemyGreen, nrEnemyRed, nrEnemyRose, bulletsEnemyGreen, bulletsEnemyRed, bulletsEnemyRose);
@@ -97,6 +102,7 @@ int gameStarted(SDL_Window **window, SDL_Renderer **renderer, SDL_Event *event, 
                 {  
                     printf("Exit button clicked\n");
                     *state = LOAD_PAGE;
+                    saveScore(player1, &score);
                     /// --- CLEANUP --- ///
                     asteroidDestroyer(&homeButton, &score, &player.texture, bullet, heart, nrBullets, player.lives);
                     destroyEnemyTextures(green, red, rose, nrEnemyGreen, nrEnemyRed, nrEnemyRose, bulletsEnemyGreen, bulletsEnemyRed, bulletsEnemyRose);
@@ -138,12 +144,17 @@ int gameStarted(SDL_Window **window, SDL_Renderer **renderer, SDL_Event *event, 
         SDL_RenderClear(*renderer);
 
         SDL_RenderCopy(*renderer, homeButton, NULL, &homeButtonRect);
-        SDL_RenderCopy(*renderer, score, NULL, &scoreRect);
+
+        char scoreText[20];
+        sprintf(scoreText, "Score : %d", score.value);
+        score.texture = createTextTexture(renderer, PATH_PREMIER, 50, scoreText, score.color);
+        SDL_RenderCopy(*renderer, score.texture, NULL, &score.rect);
+
         SDL_RenderCopy(*renderer, player.texture, NULL, &player.rect);
 
 
         handleHeart(renderer, heart, player.lives);
-       
+
         if (!playerDead)
         {
             handleEnemy(window, renderer,
@@ -157,7 +168,7 @@ int gameStarted(SDL_Window **window, SDL_Renderer **renderer, SDL_Event *event, 
 
 
             playerTouched = checkCollisionPlayer(player, bulletsEnemyGreen, bulletsEnemyRed, bulletsEnemyRose, nrEnemyGreen, nrEnemyRed, nrEnemyRose);
-            levelPassed = checkCollisionEnemy(bullet, nrBullets, green, red, rose, nrEnemyGreen, nrEnemyRed, nrEnemyRose, &nrTotalDeadEnemy);
+            levelPassed = checkCollisionEnemy(bullet, nrBullets, green, red, rose, nrEnemyGreen, nrEnemyRed, nrEnemyRose, &nrTotalDeadEnemy, &score);
 
           
             handleLevelPassed(renderer, levelPassed, color);
@@ -174,7 +185,7 @@ int gameStarted(SDL_Window **window, SDL_Renderer **renderer, SDL_Event *event, 
 
 void asteroidDestroyer(
     SDL_Texture **homeButton, 
-    SDL_Texture **score, 
+    Score *score, 
     SDL_Texture **playerTexture, 
     Bullet *bullets, 
     Heart *hearts, 
@@ -187,10 +198,10 @@ void asteroidDestroyer(
         SDL_DestroyTexture(*homeButton);
         *homeButton = NULL;
     }
-    if (*score) {
+    if (score->texture) {
         printf("Destroying score texture\n");
-        SDL_DestroyTexture(*score);
-        *score = NULL;
+        SDL_DestroyTexture(score->texture);
+        score = NULL;
     }
     if (*playerTexture) {
         printf("Destroying player texture\n");
@@ -215,31 +226,9 @@ void asteroidDestroyer(
     }
 }
 
-void handleHeart(SDL_Renderer **renderer, Heart *heart, int playerLives)
-{
-     for (int i=0; i<playerLives; i++)
-            if (heart[i].active)
-                SDL_RenderCopy(*renderer, heart[i].texture, NULL, &heart[i].rect);
-    
-}
 
-void handleBullets(SDL_Renderer **renderer, Bullet *bullet, int nrBullets)
-{
-    for (int i =0; i<nrBullets; i++)
-    {
-        if (bullet[i].active)
-        {
-            if (bullet[i].rect.y > 30)
-            {
-                bullet[i].rect.y -=4;
-                SDL_RenderCopy(*renderer, bullet[i].texture, NULL, &bullet[i].rect);
-            }
-            else 
-                bullet[i].active = 0;
-        }
-    
-    }
-}
+
+
 
 
 int checkCollisionEnemy(
@@ -251,8 +240,8 @@ int checkCollisionEnemy(
     int nrEnemyGreen, 
     int nrEnemyRed, 
     int nrEnemyRose,
-    int *nrTotalDeadEnemy)
-
+    int *nrTotalDeadEnemy,
+    Score *score)
 
 {
     
@@ -310,6 +299,9 @@ int checkCollisionEnemy(
     }
     int totalEnemy = nrEnemyGreen+nrEnemyRed+nrEnemyRose;
 
+    score->value = *nrTotalDeadEnemy*5;
+    printf("Score value %d\n", score->value);
+
     if ( *nrTotalDeadEnemy == totalEnemy)
     {
         printf("All enemy destroyed\n");
@@ -332,10 +324,8 @@ int checkCollisionPlayer(
     {
         if (SDL_HasIntersection(&player.rect, &bulletsEnemyGreen[i].rect))
         {
-            printf("Player touched by green enemy bullet %d\n", i);
             bulletsEnemyGreen[i].active = 0;
             bulletsEnemyGreen[i].rect.y = HEIGHT + 200; // fix bug
-            printf("Bulle enemy avtive status : %d (should not be active)\n", bulletsEnemyGreen[i].active);
             SDL_Delay(10);
             return 1;
         }
@@ -364,46 +354,6 @@ int checkCollisionPlayer(
 }
 
 
-int handlePlayerTouched(SDL_Renderer **renderer, int *playerTouched, Player *player, Heart *heart)
-{
-
-    if (player->lives == 0)
-    {
-        printf("Game Over\n");
-        SDL_Color color = COLOR_COSMIC_PINK;
-        SDL_Texture *gameOverTxt = createTextTexture(renderer, PATH_PREMIER, 50, "Game Over", color);
-        SDL_Rect gameOverRect = {WIDTH/2 - 100, HEIGHT/2 - 50, 200, 100};
-        SDL_RenderCopy(*renderer, gameOverTxt, NULL, &gameOverRect);
-        return 1;
-
-    }
-    if (*playerTouched)
-    {
-        *playerTouched =0;
-
-        player->lives -=1;
-        printf("Player lives : %d\n", player->lives);
-        if (player->lives == 0)
-        {
-            printf("Game Over\n");
-            SDL_Color color = COLOR_COSMIC_PINK;
-            SDL_Texture *gameOverTxt = createTextTexture(renderer, PATH_PREMIER, 50, "Game Over", color);
-            SDL_Rect gameOverRect = {WIDTH/2 - 100, HEIGHT/2 - 50, 200, 100};
-            SDL_RenderCopy(*renderer, gameOverTxt, NULL, &gameOverRect);
-            return 1;
-         
-        }
-        else
-        {
-            for (int i = 0; i < player->lives; i++)
-            {
-                heart[i].active = 1;
-            }
-        }
-    }
-    return 0;
-}
-
 void handleLevelPassed(SDL_Renderer **renderer, int levelPassed, SDL_Color color)
 {
     if (levelPassed)
@@ -412,4 +362,30 @@ void handleLevelPassed(SDL_Renderer **renderer, int levelPassed, SDL_Color color
                 SDL_Rect lvlPassedRect = {WIDTH/2 - 100, HEIGHT/2 - 50, 200, 100};
                 SDL_RenderCopy(*renderer, lvlPassedTxt, NULL, &lvlPassedRect);
             }
+}
+
+
+
+void saveScore(User *player1, Score *score)
+{
+    char filepath[300] = "/Users/phelelep/Desktop/ProgProjGit/projPolytechInfoSpaceInvaders/score.txt";
+    FILE *file = fopen(filepath, "a"); // Ouvrir le fichier en mode ajout (append)
+    if (file == NULL)
+    {
+        // Si le fichier n'existe pas, le créer
+        printf("Creating the file %s for saving data\n", filepath);
+        file = fopen(filepath, "w");
+        if (file == NULL)
+        {
+            printf("Failed to create the file %s\n", filepath);
+            return;
+        }
+    }
+
+    //ecriture
+    fprintf(file, "Name: %s, Score: %d;\n", player1->Name, score->value);
+
+    printf("Score saved\n");
+
+    fclose(file);
 }

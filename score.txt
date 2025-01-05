@@ -1,0 +1,3 @@
+Name: scoore, Score: 15;
+Name: daniel, Score: 65;
+Name: Type your name, Score: 10;

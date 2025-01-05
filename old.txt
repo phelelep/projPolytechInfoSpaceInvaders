@@ -1,0 +1,7 @@
+Name: io bor, Score: 20;
+Name: jean mulin, Score: 65;
+Name: DucDeRev, Score: 605;
+Name: paramram, Score: 5;
+Name: Rotterdam, Score: 95;Name: daniel, Score: 10;
+Name: ff, Score: 15;
+Name: daniel, Score: 35;
